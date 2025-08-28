@@ -1,0 +1,210 @@
+=============================
+GITHUB GUIDE FOR COLLABORATION
+=============================
+
+This document explains how to set up GitHub for your project, collaborate with others safely, and track all changes in detail.
+
+-------------------------------------------------
+1. INSTALL GIT LOCALLY
+-------------------------------------------------
+- Linux:
+    sudo apt install git        # Ubuntu/Debian
+    sudo dnf install git        # Fedora
+- macOS:
+    brew install git
+- Windows:
+    Download and install from https://git-scm.com/
+
+Check installation:
+    git --version
+
+Set up your identity for Git:
+    git config --global user.name "Your Name"
+    git config --global user.email "your_email@example.com"
+
+-------------------------------------------------
+2. CREATE A GITHUB REPOSITORY
+-------------------------------------------------
+1. Go to https://github.com and log in.
+2. Click the '+' icon → 'New repository'.
+3. Enter a repository name (e.g., HE381), description optional.
+4. Choose:
+   - Public → anyone can see
+   - Private → only collaborators can see
+5. Do NOT initialize with README if you already have files locally.
+6. Click "Create repository".
+
+-------------------------------------------------
+3. INITIALIZE YOUR LOCAL FOLDER
+-------------------------------------------------
+Navigate to your project folder:
+    cd /path/to/your/project
+
+If there was a previous git repo:
+    rm -rf .git   # this removes old git history
+
+Initialize git:
+    git init
+    git branch -M main
+    git add .
+    git commit -m "Initial commit"
+
+-------------------------------------------------
+4. ADD GITHUB REMOTE (SSH METHOD - RECOMMENDED)
+-------------------------------------------------
+Generate SSH key (if none exists):
+    ssh-keygen -t ed25519 -C "your_email@example.com"
+    # Press Enter to accept default location
+    # Optionally set a passphrase
+
+Start the ssh-agent and add your key:
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/id_ed25519
+
+Copy the public key:
+    cat ~/.ssh/id_ed25519.pub
+
+Go to GitHub → Settings → SSH and GPG keys → New SSH key
+- Paste the key, give it a name, save.
+
+Set your remote to SSH:
+    git remote add origin git@github.com:YourUsername/RepoName.git
+
+Test connection:
+    ssh -T git@github.com
+    # Should see: "Hi YourUsername! You've successfully authenticated."
+
+-------------------------------------------------
+5. PUSH LOCAL FILES TO GITHUB
+-------------------------------------------------
+Push the main branch:
+    git push -u origin main
+
+- Your local files are now on GitHub.
+- Collaborators can clone or pull updates but cannot access your local machine.
+
+-------------------------------------------------
+6. COLLABORATION WORKFLOW (DETAILED)
+-------------------------------------------------
+This section explains step by step how multiple collaborators can work on the same repository without overwriting each other’s changes, while keeping track of who changed what and when.
+
+STEP 1: **Clone the repository (for new collaborators)**
+- Each collaborator copies the repository to their own computer:
+    git clone git@github.com:YourUsername/RepoName.git
+- All edits happen locally first.
+
+STEP 2: **Create a branch for your work**
+- Never work directly on `main` branch for new features or plots.
+- Create a feature branch:
+    git checkout -b feature-new-plot
+
+STEP 3: **Edit files locally**
+- Add or modify scripts, notebooks, or plots.
+- Save changes locally — they are not on GitHub yet.
+
+STEP 4: **Stage and commit changes**
+- Stage files:
+    git add .
+- Commit with clear message:
+    git commit -m "Add histogram of causal set layer distribution"
+
+STEP 5: **Push your branch to GitHub**
+- Push your branch:
+    git push origin feature-new-plot
+
+STEP 6: **Open a Pull Request (PR)**
+- Go to GitHub repository in browser.
+- Click **Compare & pull request** next to your branch.
+- Add description and context.
+- Assign reviewers (optional).
+
+STEP 7: **Merge into main**
+- After approval, merge the PR into `main`.
+- GitHub records:
+    - Who created the PR
+    - Who approved/merged
+    - Timestamp
+    - All committed changes
+
+STEP 8: **Update your local main**
+- After others merge PRs:
+    git checkout main
+    git pull origin main
+
+STEP 9: **Handling conflicts**
+- If two collaborators edited same lines:
+    1. Pull latest changes: `git pull origin main`
+    2. Edit conflicting files; Git marks conflicts:
+        <<<<<<< HEAD
+        your changes
+        =======
+        other collaborator's changes
+        >>>>>>> branch-name
+    3. Stage and commit resolved files:
+        git add filename
+        git commit -m "Resolve merge conflict in filename"
+    4. Push to GitHub.
+
+STEP 10: **Track contributions**
+- Git commands:
+    - `git log` → list commits with author, date, message
+    - `git blame filename` → see which author last modified each line
+    - `git diff` → see changes before committing
+- On GitHub:
+    - Commits tab
+    - Pull Requests with discussion history
+    - File history
+
+VISUALIZATION (ASCII workflow):
+
+Your Local Machine               GitHub                Collaborator's Machine
+-------------------              ------                -----------------------
+edit script1.py                  <- Push PR           clone repo
+git add + commit                 <- Review/merge      edit script2.py
+git push branch                  -> Merge PR           add + commit
+                                 -> Update main       git pull main
+                                 <- main updated      main updated
+
+Notes:
+- Changes flow via GitHub; local edits are private until pushed.
+- Collaborators never access your computer.
+- All commits are tracked with author + timestamp.
+
+-------------------------------------------------
+7. TRACKING CHANGES AND SAFETY
+-------------------------------------------------
+- Collaborators cannot modify your local files.
+- Your local changes only appear on GitHub when you push.
+- GitHub + Git track:
+    - Author
+    - Timestamp
+    - Detailed diff
+- Use branches + PRs for safe collaboration.
+
+-------------------------------------------------
+8. BEST PRACTICES
+-------------------------------------------------
+- Include a README.md explaining purpose, dependencies, and usage.
+- Use .gitignore to avoid committing large datasets or temporary files.
+- Commit frequently with clear messages.
+- Use feature branches for all non-trivial changes.
+- Review pull requests for quality control.
+- Revoke old PATs immediately; do not store sensitive info in repo.
+
+-------------------------------------------------
+9. TROUBLESHOOTING
+-------------------------------------------------
+- Authentication issues:
+    - SSH recommended over HTTPS.
+    - For HTTPS, use Personal Access Token (PAT), not password.
+- Windows/OneDrive permission issues:
+    - Use `bash script.sh` if +x fails.
+    - Convert line endings to UNIX: `dos2unix script.sh`.
+- Merge conflicts:
+    - Pull latest changes.
+    - Resolve conflicts manually.
+    - Commit and push.
+
+-------------------------------------------------
+END OF GUIDE
+-------------------------------------------------
